@@ -17,7 +17,7 @@ const CategoryItem = ({ category }) => {
       </div>
     
     )
-}
+};
 
 
 
