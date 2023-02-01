@@ -29,8 +29,33 @@ const firebaseConfig = {
   console.log(UserDocRef);
 
   const userSnapshot = await getDoc(UserDocRef);
-  console.log(userSnapshot.exists())
+  console.log(userSnapshot.exists());
+
+  if(!userSnapshot.exists()) {
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+
+    try {
+      await setDoc(UserDocRef, {
+        displayName, 
+        email, 
+        createdAt
+      });
+    } catch (error) {
+      console.log('error creating user', error.message);
+    }
+  }
+
+  return UserDocRef;
   // This can tell us if inside our database if the refrence exists: returns a boolean
-}
+
+  // First check if user data exists-
+
+  // Return userDocRef
+
+  // if not -
+
+  // Create/setDoc with data
+};
 
 
