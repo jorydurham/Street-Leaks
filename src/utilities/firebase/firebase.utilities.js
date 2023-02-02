@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -21,15 +21,16 @@ const firebaseConfig = {
 
   export const auth = getAuth();
   export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+  export const signInWithGoogleRedirect = () => signInWithRedirect(auth, provider);
+  // This is specific for google, there other other providers, EX: facebookAuthProvider
 
   export const db = getFirestore();
 // this allows us to tell firebase when we want to get/set a doc inside our database
-  export const createUserDocumentFromAuth = async (userAuth) => {
+  export const createUserDocumentFromAuth = async (userAuth, additionalInfo = {}) => {
+    if (!userAuth) return;
   const UserDocRef = doc(db, 'users', userAuth.uid);
-  console.log(UserDocRef);
 
   const userSnapshot = await getDoc(UserDocRef);
-  console.log(userSnapshot.exists());
 
   if(!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
@@ -39,7 +40,8 @@ const firebaseConfig = {
       await setDoc(UserDocRef, {
         displayName, 
         email, 
-        createdAt
+        createdAt,
+        ...additionalInfo
       });
     } catch (error) {
       console.log('error creating user', error.message);
@@ -59,3 +61,9 @@ const firebaseConfig = {
 };
 
 
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if(!email || !password) return;
+
+
+  return await createUserWithEmailAndPassword(auth, email, password);
+};
